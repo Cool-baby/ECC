@@ -177,49 +177,35 @@ def ecc_encrypt_and_decrypt():
     # 获取该椭圆曲线的阶
     n = get_order(G_x, G_y, a, b, p)
     # 获取私钥并且key < 椭圆曲线的阶n
-    private_key = int(input("输入私钥key(<%d):" % n))
+    private_key = int(input("输入A的私钥key(<%d):" % n))
     # 计算公钥 nG
     Q = calculate_np(G_x, G_y, private_key, a, p)
-    print("==================生成公钥{a=%d,b=%d,p=%d,阶%d,G(%d,%d),Q(%d,%d)}======" % (a, b, p, n, G_x, G_y, Q[0], Q[1]))
+    print("======生成公钥{a=%d,b=%d,p=%d,阶%d,G(%d,%d),Q(%d,%d)}======" % (a, b, p, n, G_x, G_y, Q[0], Q[1]))
     # 加密准备
-    k = int(input("请给出整数(<%d):" % n))
+    k = int(input("请随机给A一个整数(<%d):" % n))
     k_G_x,k_G_y = calculate_np(G_x, G_y, k, a, p)  # 计算kG
     k_Q_x,k_Q_y = calculate_np(Q[0], Q[1], k, a, p)  # 计算kQ
 
 
     '''
-    # 加密开始
-
-    plain_text = int(input("请输入要加密的明文："))
-    cipher_text = plain_text * k_Q[0]  # 计算明文与kQ横坐标的乘积
-    # 密文为
-    C = [k_G[0], k_G[1], cipher_text]
-    print("密文为：{(%d,%d),%d}" % (C[0], C[1], C[2]))
-    # 解密
-    # 计算private_key*kG
-    decrypto_text = calculate_np(C[0], C[1], private_key, a, p)
-
-    inverse_value = get_inverse_element(decrypto_text[0], p)
-    m = C[2] * inverse_value % p
-    print("解密后的明文为%d" % m)
+    B加密阶段
     '''
-
-    # 加密
     plain_text = input("请输入需要加密的字符串:")
     plain_text = plain_text.strip()
-    #plain_text = int(input("user1：请输入需要加密的密文："))
     c = []
-    print("密文为：",end="")
+
+    print(f"B将公钥a={a}，b={b}，p={p}，n={n}，生成元G=({G_x},{G_y})，Q=({Q[0]},{Q[1]})，密文：",end="")
     for char in plain_text:
         intchar = ord(char)
         cipher_text = intchar*k_Q_x
         c.append([k_G_x, k_G_y, cipher_text])
         print("({},{}),{}".format(k_G_x, k_G_y, cipher_text),end="-")
-
-    # user1阶段
-    # 拿到user2加密的数据进行解密
-    # 知道 k_G_x,k_G_y，key情况下，求解k_Q_x,k_Q_y是容易的，然后plain_text = cipher_text/k_Q_x
-    print("\n解密得到明文：",end="")
+    print("发送至A")
+    '''
+    A拿到B加密的数据进行解密
+    知道 k_G_x,k_G_y，key情况下，求解k_Q_x,k_Q_y是容易的，然后plain_text = cipher_text/k_Q_x
+    '''
+    print("A解密得到明文：",end="")
     for charArr in c:
         decrypto_text_x,decrypto_text_y = calculate_np(charArr[0], charArr[1], private_key, a, p)
         print(chr(charArr[2]//decrypto_text_x),end="")
